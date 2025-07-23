@@ -50,15 +50,15 @@ module.exports = {
       .setTitle('✈️ A new job has popped up!')
       .setColor('#FFB500')
       .addFields(
-        { name: '📄 Name:', value: name, inline: false },
-        { name: '📦 Onboard:', value: onboard, inline: false },
-        { name: '🛫 Route:', value: `${departure} ✈️ ${arrival}`, inline: false },
-        { name: '✈️ Aircraft:', value: aircraft, inline: false },
-        { name: '💰 Reward:', value: reward, inline: false },
-        { name: '📋 Job description:', value: description, inline: false },
-        { name: '📊 Status:', value: 'Unclaimed', inline: true },
-        { name: '👤 Claimed by:', value: 'None', inline: true },
-        { name: '🆔 Job ID:', value: jobId.toString(), inline: true }
+        { name: `📄 Name: ${name}`, value: '\u200B', inline: false },
+        { name: `📦 Onboard: ${onboard}`, value: '\u200B', inline: false },
+        { name: `🛫 Route: ${departure} ✈️ ${arrival}`, value: '\u200B', inline: false },
+        { name: `✈️ Aircraft: ${aircraft}`, value: '\u200B', inline: false },
+        { name: `💰 Reward: ${reward}`, value: '\u200B', inline: false },
+        { name: `📋 Job description: ${description}`, value: '\u200B', inline: false },
+        { name: '📊 Status: Unclaimed', value: '\u200B', inline: true },
+        { name: '👤 Claimed by: None', value: '\u200B', inline: true },
+        { name: `🆔 Job ID: ${jobId}`, value: '\u200B', inline: true }
       )
       .setFooter({ text: 'React to claim!' });
 

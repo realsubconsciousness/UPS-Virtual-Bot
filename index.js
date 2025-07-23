@@ -77,8 +77,8 @@ client.on('interactionCreate', async interaction => {
       const fields = originalEmbed.fields;
       
       // Check if job is already claimed
-      const statusField = fields.find(field => field.name === '📊 Status:');
-      if (statusField && statusField.value === 'Claimed') {
+      const statusField = fields.find(field => field.name.includes('📊 Status:'));
+      if (statusField && statusField.name.includes('Claimed')) {
         return await interaction.reply({ 
           content: 'This job has already been claimed!', 
           ephemeral: true 
@@ -87,11 +87,11 @@ client.on('interactionCreate', async interaction => {
       
       // Update the embed fields
       const updatedFields = fields.map(field => {
-        if (field.name === '📊 Status:') {
-          return { ...field, value: 'Claimed' };
+        if (field.name === '📊 Status: Unclaimed') {
+          return { ...field, name: '📊 Status: Claimed' };
         }
-        if (field.name === '👤 Claimed by:') {
-          return { ...field, value: `<@${interaction.user.id}>` };
+        if (field.name === '👤 Claimed by: None') {
+          return { ...field, name: `👤 Claimed by: <@${interaction.user.id}>` };
         }
         return field;
       });
