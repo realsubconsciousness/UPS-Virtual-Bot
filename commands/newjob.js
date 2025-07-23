@@ -56,9 +56,9 @@ module.exports = {
         { name: `✈️ Aircraft: ${aircraft}`, value: '\u200B', inline: false },
         { name: `💰 Reward: ${reward}`, value: '\u200B', inline: false },
         { name: `📋 Job description: ${description}`, value: '\u200B', inline: false },
-        { name: '📊 Status: Unclaimed', value: '\u200B', inline: true },
-        { name: '👤 Claimed by: None', value: '\u200B', inline: true },
-        { name: `🆔 Job ID: ${jobId}`, value: '\u200B', inline: true }
+        { name: '📊 Status:', value: 'Unclaimed', inline: true },
+        { name: '👤 Claimed by:', value: 'None', inline: true },
+        { name: '🆔 Job ID:', value: jobId.toString(), inline: true }
       )
       .setFooter({ text: 'React to claim!' });
 
