@@ -267,10 +267,21 @@ client.on('interactionCreate', async interaction => {
           `New uPoints: ${newPoints}`
         );
       
-      await interaction.update({
-        embeds: [successEmbed],
-        components: []
-      });
+      try {
+        await interaction.update({
+          embeds: [successEmbed],
+          components: []
+        });
+      } catch (error) {
+        if (error.code === 'InteractionAlreadyReplied') {
+          await interaction.followUp({
+            embeds: [successEmbed],
+            ephemeral: true
+          });
+        } else {
+          console.error('Error updating interaction:', error);
+        }
+      }
     }
     
     // Handle upoints cancel
@@ -280,10 +291,21 @@ client.on('interactionCreate', async interaction => {
         .setColor("#FF0000")
         .setDescription("uPoints modification has been cancelled.");
       
-      await interaction.update({
-        embeds: [cancelEmbed],
-        components: []
-      });
+      try {
+        await interaction.update({
+          embeds: [cancelEmbed],
+          components: []
+        });
+      } catch (error) {
+        if (error.code === 'InteractionAlreadyReplied') {
+          await interaction.followUp({
+            embeds: [cancelEmbed],
+            ephemeral: true
+          });
+        } else {
+          console.error('Error updating interaction:', error);
+        }
+      }
     }
   }
 });
