@@ -114,6 +114,177 @@ client.on('interactionCreate', async interaction => {
         components: [disabledRow] 
       });
     }
+    
+    // Handle upoints button interactions
+    if (interaction.customId.startsWith('upoints_')) {
+      const fs = require("fs");
+      const path = require("path");
+      
+      const dataFile = path.join(__dirname, "userdata.json");
+      
+      function loadUserData() {
+        try {
+          if (fs.existsSync(dataFile)) {
+            const data = fs.readFileSync(dataFile, "utf8");
+            return JSON.parse(data);
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+        }
+        return {};
+      }
+      
+      function saveUserData(data) {
+        try {
+          fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
+        } catch (error) {
+          console.error("Error saving user data:", error);
+        }
+      }
+      
+      function getUserPoints(userId) {
+        const userData = loadUserData();
+        return userData[userId]?.upoints || 0;
+      }
+      
+      function setUserPoints(userId, points) {
+        const userData = loadUserData();
+        if (!userData[userId]) {
+          userData[userId] = {};
+        }
+        userData[userId].upoints = points;
+        saveUserData(userData);
+      }
+      
+      const parts = interaction.customId.split('_');
+      const action = parts[1]; // 'add' or 'remove'
+      const userId = parts[2];
+      const number = parseInt(parts[3]);
+      
+      const currentPoints = getUserPoints(userId);
+      let newPoints;
+      
+      if (action === 'add') {
+        newPoints = currentPoints + number;
+      } else if (action === 'remove') {
+        newPoints = Math.max(0, currentPoints - number); // Don't allow negative points
+      }
+      
+      // Confirmation embed
+      const confirmEmbed = new Discord.EmbedBuilder()
+        .setTitle("Confirm uPoints Change")
+        .setColor("#FFB500")
+        .setDescription(
+          `Are you sure you want to ${action} ${number} uPoints ${action === 'add' ? 'to' : 'from'} <@${userId}>?\n\n` +
+          `Current uPoints: ${currentPoints}\n` +
+          `New uPoints: ${newPoints}`
+        );
+      
+      const confirmButton = new Discord.ButtonBuilder()
+        .setCustomId(`upoints_confirm_${action}_${userId}_${number}`)
+        .setLabel("Confirm")
+        .setStyle(Discord.ButtonStyle.Success)
+        .setEmoji("✅");
+      
+      const cancelButton = new Discord.ButtonBuilder()
+        .setCustomId("upoints_cancel")
+        .setLabel("Cancel")
+        .setStyle(Discord.ButtonStyle.Secondary)
+        .setEmoji("❌");
+      
+      const confirmRow = new Discord.ActionRowBuilder().addComponents(confirmButton, cancelButton);
+      
+      await interaction.update({
+        embeds: [confirmEmbed],
+        components: [confirmRow]
+      });
+    }
+    
+    // Handle upoints confirmation
+    if (interaction.customId.startsWith('upoints_confirm_')) {
+      const fs = require("fs");
+      const path = require("path");
+      
+      const dataFile = path.join(__dirname, "userdata.json");
+      
+      function loadUserData() {
+        try {
+          if (fs.existsSync(dataFile)) {
+            const data = fs.readFileSync(dataFile, "utf8");
+            return JSON.parse(data);
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+        }
+        return {};
+      }
+      
+      function saveUserData(data) {
+        try {
+          fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
+        } catch (error) {
+          console.error("Error saving user data:", error);
+        }
+      }
+      
+      function getUserPoints(userId) {
+        const userData = loadUserData();
+        return userData[userId]?.upoints || 0;
+      }
+      
+      function setUserPoints(userId, points) {
+        const userData = loadUserData();
+        if (!userData[userId]) {
+          userData[userId] = {};
+        }
+        userData[userId].upoints = points;
+        saveUserData(userData);
+      }
+      
+      const parts = interaction.customId.split('_');
+      const action = parts[2]; // 'add' or 'remove'
+      const userId = parts[3];
+      const number = parseInt(parts[4]);
+      
+      const currentPoints = getUserPoints(userId);
+      let newPoints;
+      
+      if (action === 'add') {
+        newPoints = currentPoints + number;
+      } else if (action === 'remove') {
+        newPoints = Math.max(0, currentPoints - number);
+      }
+      
+      setUserPoints(userId, newPoints);
+      
+      // Success embed
+      const successEmbed = new Discord.EmbedBuilder()
+        .setTitle("✅ uPoints Updated Successfully!")
+        .setColor("#00FF00")
+        .setDescription(
+          `Successfully ${action === 'add' ? 'added' : 'removed'} ${number} uPoints ${action === 'add' ? 'to' : 'from'} <@${userId}>\n\n` +
+          `Previous uPoints: ${currentPoints}\n` +
+          `New uPoints: ${newPoints}`
+        );
+      
+      await interaction.update({
+        embeds: [successEmbed],
+        components: []
+      });
+    }
+    
+    // Handle upoints cancel
+    if (interaction.customId === 'upoints_cancel') {
+      const cancelEmbed = new Discord.EmbedBuilder()
+        .setTitle("❌ Operation Cancelled")
+        .setColor("#FF0000")
+        .setDescription("uPoints modification has been cancelled.");
+      
+      await interaction.update({
+        embeds: [cancelEmbed],
+        components: []
+      });
+    }
   }
 });
 
