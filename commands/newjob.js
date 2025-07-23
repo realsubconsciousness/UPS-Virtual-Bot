@@ -62,21 +62,8 @@ module.exports = {
     const embed = new EmbedBuilder()
       .setTitle("✈️ A new job has popped up!")
       .setColor("#FFB500")
+      .setDescription(`**📄 Name:** ${name}\n**📦 Onboard:** ${onboard}\n**🛫 Route:** ${departure} ✈️ ${arrival}\n**✈️ Aircraft:** ${aircraft}\n**💰 Reward:** ${reward}\n**📋 Job description:** ${description}`)
       .addFields(
-        { name: `📄 Name: ${name}`, value: "\u200B", inline: false },
-        { name: `📦 Onboard: ${onboard}`, value: "\u200B", inline: false },
-        {
-          name: `🛫 Route: ${departure} ✈️ ${arrival}`,
-          value: "\u200B",
-          inline: false,
-        },
-        { name: `✈️ Aircraft: ${aircraft}`, value: "\u200B", inline: false },
-        { name: `💰 Reward: ${reward}`, value: "\u200B", inline: false },
-        {
-          name: `📋 Job description: ${description}`,
-          value: "\u200B",
-          inline: false,
-        },
         { name: "📊 Status:", value: "Unclaimed", inline: true },
         { name: "👤 Claimed by:", value: "None", inline: true },
         { name: "🆔 Job ID:", value: jobId.toString(), inline: true },
