@@ -4,34 +4,34 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('newjob')
-    .setDescription('Create a new job posting for pilots')
+    .setDescription('Sends a new job for pilots to claim!')
     .addStringOption(option =>
       option.setName('name')
         .setDescription('Job name')
         .setRequired(true))
     .addStringOption(option =>
       option.setName('onboard')
-        .setDescription('What to onboard')
+        .setDescription('What is onboard')
         .setRequired(true))
     .addStringOption(option =>
       option.setName('departure')
-        .setDescription('Departure airport (e.g., Gran Canaria (GCLP))')
+        .setDescription('Departure airport (e.g. Gran Canaria (GCLP)')
         .setRequired(true))
     .addStringOption(option =>
       option.setName('arrival')
-        .setDescription('Arrival airport (e.g., Larnaca (LCLK))')
+        .setDescription('Arrival airport (e.g. Larnaca (LCLK)')
         .setRequired(true))
     .addStringOption(option =>
       option.setName('aircraft')
-        .setDescription('Aircraft type')
+        .setDescription("Aircraft's ICAO (B757)")
         .setRequired(true))
     .addStringOption(option =>
       option.setName('reward')
-        .setDescription('Reward amount')
+        .setDescription("Job's reward")
         .setRequired(true))
     .addStringOption(option =>
       option.setName('description')
-        .setDescription('Job description')
+        .setDescription('Description of the job')
         .setRequired(true)),
 
   async execute(interaction) {
@@ -48,7 +48,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setTitle('✈️ A new job has popped up!')
-      .setColor('#FFA500')
+      .setColor('#FFB500')
       .addFields(
         { name: '📄 Name:', value: name, inline: false },
         { name: '📦 Onboard:', value: onboard, inline: false },
