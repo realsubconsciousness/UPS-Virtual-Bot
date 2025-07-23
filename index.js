@@ -52,18 +52,68 @@ async function registerCommands() {
   }
 }
 
-// Handle slash commands
+// Handle slash commands and button interactions
 client.on('interactionCreate', async interaction => {
-  if (!interaction.isChatInputCommand()) return;
+  // Handle slash commands
+  if (interaction.isChatInputCommand()) {
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+    
+    try {
+      await command.execute(interaction);
+    } catch (error) {
+      console.error(error);
+      await interaction.reply({ content: 'Command error!', ephemeral: true });
+    }
+  }
   
-  const command = client.commands.get(interaction.commandName);
-  if (!command) return;
-  
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(error);
-    await interaction.reply({ content: 'Command error!', ephemeral: true });
+  // Handle button interactions
+  if (interaction.isButton()) {
+    if (interaction.customId.startsWith('claim_job_')) {
+      const jobId = interaction.customId.split('_')[2];
+      
+      // Get the original embed
+      const originalEmbed = interaction.message.embeds[0];
+      const fields = originalEmbed.fields;
+      
+      // Check if job is already claimed
+      const statusField = fields.find(field => field.name === '📊 Status:');
+      if (statusField && statusField.value === 'Claimed') {
+        return await interaction.reply({ 
+          content: 'This job has already been claimed!', 
+          ephemeral: true 
+        });
+      }
+      
+      // Update the embed fields
+      const updatedFields = fields.map(field => {
+        if (field.name === '📊 Status:') {
+          return { ...field, value: 'Claimed' };
+        }
+        if (field.name === '👤 Claimed by:') {
+          return { ...field, value: `<@${interaction.user.id}>` };
+        }
+        return field;
+      });
+      
+      // Create updated embed
+      const updatedEmbed = Discord.EmbedBuilder.from(originalEmbed)
+        .setFields(updatedFields)
+        .setColor('#00FF00'); // Change color to green when claimed
+      
+      // Disable the button
+      const disabledButton = Discord.ButtonBuilder.from(interaction.message.components[0].components[0])
+        .setDisabled(true)
+        .setLabel('Job Claimed')
+        .setStyle(Discord.ButtonStyle.Secondary);
+      
+      const disabledRow = new Discord.ActionRowBuilder().addComponents(disabledButton);
+      
+      await interaction.update({ 
+        embeds: [updatedEmbed], 
+        components: [disabledRow] 
+      });
+    }
   }
 });
 
