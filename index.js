@@ -102,17 +102,23 @@ client.on('interactionCreate', async interaction => {
         .setFields(updatedFields)
         .setColor('#00FF00'); // Change color to green when claimed
       
-      // Disable the button
-      const disabledButton = Discord.ButtonBuilder.from(interaction.message.components[0].components[0])
+      // Disable the claim button and add the done button
+      const disabledClaimButton = Discord.ButtonBuilder.from(interaction.message.components[0].components[0])
         .setDisabled(true)
         .setLabel('Job Claimed')
         .setStyle(Discord.ButtonStyle.Secondary);
       
-      const disabledRow = new Discord.ActionRowBuilder().addComponents(disabledButton);
+      const doneButton = new Discord.ButtonBuilder()
+        .setCustomId(`mark_done_${jobId}`)
+        .setLabel("Mark as Done")
+        .setStyle(Discord.ButtonStyle.Success)
+        .setEmoji("✅");
+      
+      const updatedRow = new Discord.ActionRowBuilder().addComponents(disabledClaimButton, doneButton);
       
       await interaction.update({ 
         embeds: [updatedEmbed], 
-        components: [disabledRow] 
+        components: [updatedRow] 
       });
     }
     
