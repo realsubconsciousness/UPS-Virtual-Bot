@@ -307,7 +307,62 @@ client.on('interactionCreate', async interaction => {
           console.error('Error updating interaction:', error);
         }
       }
-    }    
+    }
+    
+    // Handle mark as done button interactions
+    if (interaction.customId.startsWith('mark_done_')) {
+      // Check if user has administrator permission
+      if (!interaction.member.permissions.has(Discord.PermissionFlagsBits.Administrator)) {
+        return await interaction.reply({
+          content: "❌ You need Administrator permission to mark jobs as done!",
+          ephemeral: true
+        });
+      }
+      
+      const jobId = interaction.customId.split('_')[2];
+      
+      // Get the original embed
+      const originalEmbed = interaction.message.embeds[0];
+      const fields = originalEmbed.fields;
+      
+      // Check if job is already done
+      const statusField = fields.find(field => field.name === '📊 Status:');
+      if (statusField && statusField.value === 'Done') {
+        return await interaction.reply({ 
+          content: 'This job is already marked as done!', 
+          ephemeral: true 
+        });
+      }
+      
+      // Update the embed fields
+      const updatedFields = fields.map(field => {
+        if (field.name === '📊 Status:') {
+          return { ...field, value: 'Done' };
+        }
+        return field;
+      });
+      
+      // Create updated embed
+      const updatedEmbed = Discord.EmbedBuilder.from(originalEmbed)
+        .setFields(updatedFields)
+        .setColor('#32CD32'); // Change color to lime green when done
+      
+      // Disable all buttons
+      const disabledClaimButton = Discord.ButtonBuilder.from(interaction.message.components[0].components[0])
+        .setDisabled(true);
+      
+      const disabledDoneButton = Discord.ButtonBuilder.from(interaction.message.components[0].components[1])
+        .setDisabled(true)
+        .setLabel('Job Complete')
+        .setStyle(Discord.ButtonStyle.Secondary);
+      
+      const disabledRow = new Discord.ActionRowBuilder().addComponents(disabledClaimButton, disabledDoneButton);
+      
+      await interaction.update({ 
+        embeds: [updatedEmbed], 
+        components: [disabledRow] 
+      });
+    }
   } 
 });
 

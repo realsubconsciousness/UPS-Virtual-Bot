@@ -85,7 +85,13 @@ module.exports = {
       .setStyle(ButtonStyle.Secondary)
       .setEmoji("✋");
 
-    const row = new ActionRowBuilder().addComponents(claimButton);
+    const doneButton = new ButtonBuilder()
+      .setCustomId(`mark_done_${jobId}`)
+      .setLabel("Mark as Done")
+      .setStyle(ButtonStyle.Success)
+      .setEmoji("✅");
+
+    const row = new ActionRowBuilder().addComponents(claimButton, doneButton);
 
     await interaction.reply({ embeds: [embed], components: [row] });
   },
