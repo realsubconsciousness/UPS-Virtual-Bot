@@ -1,3 +1,4 @@
+require('dotenv').config();
 
 console.log("Working");
 
@@ -307,7 +308,7 @@ client.on('interactionCreate', async interaction => {
         }
       }
     }
-  }
+  } 
 });
 
 client.once('ready', () => {

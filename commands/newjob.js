@@ -4,6 +4,7 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  PermissionFlagsBits,
 } = require("discord.js");
 
 module.exports = {
@@ -48,6 +49,14 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    // Check if user has administrator permission
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+      return await interaction.reply({
+        content: "❌ You need Administrator permission to use this command!",
+        ephemeral: true,
+      });
+    }
+
     const name = interaction.options.getString("name");
     const onboard = interaction.options.getString("onboard");
     const departure = interaction.options.getString("departure");
