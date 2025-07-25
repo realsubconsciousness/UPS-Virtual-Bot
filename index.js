@@ -307,7 +307,7 @@ client.on('interactionCreate', async interaction => {
           console.error('Error updating interaction:', error);
         }
       }
-    }
+    }    
   } 
 });
 
