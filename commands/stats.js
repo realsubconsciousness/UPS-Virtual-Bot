@@ -14,8 +14,25 @@ module.exports = {
         
         // Load user data
         const dataFile = path.join(__dirname, '..', 'userdata.json');
-        const userData = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+        let userData = {};
+        try {
+            if (fs.existsSync(dataFile)) {
+                userData = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+            }
+        } catch (error) {
+            console.error("Error loading user data:", error);
+        }
+        
         const userPoints = userData[userId]?.upoints || 0;
+        const activeJobs = userData[userId]?.activeJobs || [];
+        
+        // Format active jobs
+        let activeJobsText = 'None';
+        if (activeJobs.length > 0) {
+            activeJobsText = activeJobs.map(job => 
+                `${job.departure} ✈️ ${job.arrival} (ID: ${job.jobId})`
+            ).join('\n');
+        }
 
         // Create embed
         const statsEmbed = new EmbedBuilder()
@@ -23,7 +40,8 @@ module.exports = {
             .setTitle(`${user.username}'s UPS Stats`)
             .setThumbnail(user.displayAvatarURL())
             .addFields(
-                { name: 'Airline Stats', value: `Total uPoints: ${userPoints}` }
+                { name: 'Airline Stats', value: `Total uPoints: ${userPoints}` },
+                { name: 'Active Jobs', value: activeJobsText }
             )
             .setFooter({ text: `UPS Virtual | ${new Date().toLocaleDateString()}` });
 

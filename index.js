@@ -86,6 +86,54 @@ client.on('interactionCreate', async interaction => {
         });
       }
       
+      // Save job to user data
+      const fs = require("fs");
+      const path = require("path");
+      const dataFile = path.join(__dirname, "userdata.json");
+      
+      function loadUserData() {
+        try {
+          if (fs.existsSync(dataFile)) {
+            const data = fs.readFileSync(dataFile, "utf8");
+            return JSON.parse(data);
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+        }
+        return {};
+      }
+      
+      function saveUserData(data) {
+        try {
+          fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
+        } catch (error) {
+          console.error("Error saving user data:", error);
+        }
+      }
+      
+      // Extract job details from embed
+      const description = originalEmbed.description;
+      const routeMatch = description.match(/\*\*🛫 Route:\*\* (.+?) ✈️ (.+?)\n/);
+      const departure = routeMatch ? routeMatch[1] : 'Unknown';
+      const arrival = routeMatch ? routeMatch[2] : 'Unknown';
+      
+      // Save job data
+      const userData = loadUserData();
+      if (!userData[interaction.user.id]) {
+        userData[interaction.user.id] = {};
+      }
+      if (!userData[interaction.user.id].activeJobs) {
+        userData[interaction.user.id].activeJobs = [];
+      }
+      
+      userData[interaction.user.id].activeJobs.push({
+        jobId: jobId,
+        departure: departure,
+        arrival: arrival
+      });
+      
+      saveUserData(userData);
+      
       // Update the embed fields
       const updatedFields = fields.map(field => {
         if (field.name === '📊 Status:') {
@@ -338,6 +386,46 @@ client.on('interactionCreate', async interaction => {
           content: 'This job is already marked as done!', 
           ephemeral: true 
         });
+      }
+      
+      // Remove job from user data
+      const fs = require("fs");
+      const path = require("path");
+      const dataFile = path.join(__dirname, "userdata.json");
+      
+      function loadUserData() {
+        try {
+          if (fs.existsSync(dataFile)) {
+            const data = fs.readFileSync(dataFile, "utf8");
+            return JSON.parse(data);
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+        }
+        return {};
+      }
+      
+      function saveUserData(data) {
+        try {
+          fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
+        } catch (error) {
+          console.error("Error saving user data:", error);
+        }
+      }
+      
+      // Find who claimed the job and remove it from their active jobs
+      const claimedByField = fields.find(field => field.name === '👤 Claimed by:');
+      if (claimedByField && claimedByField.value !== 'None') {
+        const userIdMatch = claimedByField.value.match(/<@(\d+)>/);
+        if (userIdMatch) {
+          const userId = userIdMatch[1];
+          const userData = loadUserData();
+          
+          if (userData[userId] && userData[userId].activeJobs) {
+            userData[userId].activeJobs = userData[userId].activeJobs.filter(job => job.jobId !== jobId);
+            saveUserData(userData);
+          }
+        }
       }
       
       // Update the embed fields
