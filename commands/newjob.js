@@ -50,7 +50,9 @@ module.exports = {
 
   async execute(interaction) {
     // Check if user has administrator permission
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+    if (
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
+    ) {
       return await interaction.reply({
         content: "❌ You need Administrator permission to use this command!",
         ephemeral: true,
@@ -71,13 +73,15 @@ module.exports = {
     const embed = new EmbedBuilder()
       .setTitle("✈️ A new job has popped up!")
       .setColor("#FFB500")
-      .setDescription(`**📄 Name:** ${name}\n**📦 Onboard:** ${onboard}\n**🛫 Route:** ${departure} ✈️ ${arrival}\n**✈️ Aircraft:** ${aircraft}\n**💰 Reward:** ${reward}\n**📋 Job description:**\n ${description}\n`)
+      .setDescription(
+        `**📄 Name:** ${name}\n**📦 Onboard:** ${onboard}\n**🛫 Route:** ${departure} ✈️ ${arrival}\n**✈️ Aircraft:** ${aircraft}\n**💰 Reward:** ${reward}\n**📋 Job description:**\n ${description}\n`,
+      )
       .addFields(
         { name: "📊 Status:", value: "Unclaimed", inline: true },
         { name: "👤 Claimed by:", value: "None", inline: true },
         { name: "🆔 Job ID:", value: jobId.toString(), inline: true },
       )
-      .setFooter({ text: "React to claim!" });
+      .setFooter({ text: "Use the button below to claim!" });
 
     const claimButton = new ButtonBuilder()
       .setCustomId(`claim_job_${jobId}`)
@@ -87,6 +91,17 @@ module.exports = {
 
     const row = new ActionRowBuilder().addComponents(claimButton);
 
-    await interaction.reply({ embeds: [embed], components: [row] });
+    const channel = interaction.client.channels.cache.get(
+      "1394028081034952895",
+    );
+    if (channel) {
+      await channel.send({ embeds: [embed], components: [row] });
+      await interaction.reply({
+        content: "Job successfully sent!",
+        ephemeral: true,
+      });
+    } else {
+      console.error("Channel not found.");
+    }
   },
 };
