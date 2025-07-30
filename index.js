@@ -374,6 +374,50 @@ client.on("interactionCreate", async (interaction) => {
       }
     }
 
+    // Handle viewcard button interactions
+    if (interaction.customId.startsWith("viewcard_")) {
+      const parts = interaction.customId.split("_");
+      const side = parts[1]; // 'front' or 'back'
+      const aircraft = parts[2]; // 'b757' or 'md11'
+
+      // Set title based on aircraft
+      let title;
+      if (aircraft === "b757") {
+        title = "Boeing 757";
+      } else if (aircraft === "md11") {
+        title = "McDonell Douglas MD-11";
+      }
+
+      // Create updated embed
+      const updatedEmbed = new Discord.EmbedBuilder()
+        .setTitle(title)
+        .setColor("#FFB500")
+        .setImage(`attachment://${side}.png`);
+
+      // Keep the same buttons
+      const frontButton = new Discord.ButtonBuilder()
+        .setCustomId(`viewcard_front_${aircraft}`)
+        .setLabel("Front")
+        .setStyle(Discord.ButtonStyle.Secondary);
+
+      const backButton = new Discord.ButtonBuilder()
+        .setCustomId(`viewcard_back_${aircraft}`)
+        .setLabel("Back")
+        .setStyle(Discord.ButtonStyle.Secondary);
+
+      const row = new Discord.ActionRowBuilder().addComponents(frontButton, backButton);
+
+      // Update the message with new image
+      await interaction.update({
+        embeds: [updatedEmbed],
+        components: [row],
+        files: [{
+          attachment: `media/cards/${aircraft}/${side}.png`,
+          name: `${side}.png`
+        }]
+      });
+    }
+
     // Handle mark as done button interactions
     if (interaction.customId.startsWith("mark_done_")) {
       // Check if user has administrator permission
