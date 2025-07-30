@@ -79,9 +79,8 @@ module.exports = {
       .addFields(
         { name: "📊 Status:", value: "Unclaimed", inline: true },
         { name: "👤 Claimed by:", value: "None", inline: true },
-        { name: "🆔 Job ID:", value: jobId.toString(), inline: true },
       )
-      .setFooter({ text: "Use the button below to claim!" });
+      .setFooter({ text: `Job ID: ${jobId} | Use the button below to claim!` });
 
     const claimButton = new ButtonBuilder()
       .setCustomId(`claim_job_${jobId}`)
